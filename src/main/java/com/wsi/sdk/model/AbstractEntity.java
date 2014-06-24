@@ -8,4 +8,6 @@ import android.net.Uri;
 public abstract class AbstractEntity {
     public static final String CONTENT_AUTHORITY = "com.wsi.sdk";
     protected static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+
+    public abstract Uri getContentUri();
 }

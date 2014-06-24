@@ -1,17 +1,12 @@
 package com.wsi.sdk.provider;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.database.ContentObserver;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
 
+import com.wsi.sdk.model.AbstractEntity;
 import com.wsi.sdk.model.ActiveFire;
 import com.wsi.sdk.model.FireRisk;
-import com.wsi.sdk.sync.SyncStatus;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -20,38 +15,39 @@ import java.util.List;
 public class DataProvider {
     private static final Handler sHandler = new Handler();
 
-    private static final DataHolder<ActiveFire> sActiveFiresHolder = new DataHolder<ActiveFire>();
-    private static final DataHolder<FireRisk> sFireRiskHolder = new DataHolder<FireRisk>();
+    static final DataHolder<ActiveFire> sActiveFireHolder = new DataHolder<ActiveFire>();
+    static final DataHolder<FireRisk> sFireRiskHolder = new DataHolder<FireRisk>();
 
-    public static class ContentObserverAdapter extends ContentObserver {
-        private final Uri mUri;
+    public static List<ActiveFire> getActiveFires() {
+        return sActiveFireHolder.data;
+    }
 
-        public ContentObserverAdapter(final Uri uri) {
-            super(sHandler);
-            mUri = uri;
+    public static List<FireRisk> getFireRisks() {
+        return sFireRiskHolder.data;
+    }
+
+    public static SyncStatus getStatus(Class<? extends AbstractEntity> entityClass) {
+        if (entityClass.equals(ActiveFire.class)) {
+            return sActiveFireHolder.status;
+        } else if (entityClass.equals(FireRisk.class)) {
+            return sFireRiskHolder.status;
+        } else {
+            throw new UnsupportedOperationException("unsupported type " + entityClass);
         }
+    }
 
-        @Override
-        public void onChange(boolean selfChange) {
-            onChange(selfChange, mUri);
-        }
+    public static void sync(final Context ctx) {
+        sync(ctx, null);
+    }
 
-        @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-        @Override
-        public void onChange(boolean selfChange, Uri uri) {
-            if (ActiveFire.CONTENT_URI.equals(uri)) {
-                onActiveFiresChanged(sActiveFiresHolder.data);
-            } else if (FireRisk.CONTENT_URI.equals(uri)) {
-                onFireRisksChanged(sFireRiskHolder.data);
-            } else {
-                throw new IllegalArgumentException("unsupported URI " + uri);
-            }
+    public static void sync(final Context ctx, Class<? extends AbstractEntity> entityClass) {
+        if (ctx == null) {
+            throw new IllegalArgumentException("context must not be null");
         }
+        SyncService.sync(ctx, entityClass);
+    }
 
-        protected void onActiveFiresChanged(final List<ActiveFire> data) {
-        }
-
-        protected void onFireRisksChanged(final List<FireRisk> data) {
-        }
+    private static boolean isSyncAllowed(long syncTime, long currentTime) {
+        return true;
     }
 }
