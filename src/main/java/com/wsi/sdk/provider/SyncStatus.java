@@ -7,6 +7,5 @@ public enum SyncStatus {
     UNDEFINED,
     SYNCHRONIZING,
     SYNCHRONIZED,
-    IO_ERROR,
     ERROR
 }

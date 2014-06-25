@@ -7,7 +7,12 @@ import com.wsi.sdk.model.AbstractEntity;
 import com.wsi.sdk.model.ActiveFire;
 import com.wsi.sdk.model.FireRisk;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Created by Ievgen Usenko on 6/23/14.
@@ -15,8 +20,11 @@ import java.util.List;
 public class DataProvider {
     private static final Handler sHandler = new Handler();
 
-    static final DataHolder<ActiveFire> sActiveFireHolder = new DataHolder<ActiveFire>();
-    static final DataHolder<FireRisk> sFireRiskHolder = new DataHolder<FireRisk>();
+    private static final DataHolder<ActiveFire> sActiveFireHolder = new DataHolder<ActiveFire>(ActiveFire.CONTENT_URI);
+    private static final DataHolder<FireRisk> sFireRiskHolder = new DataHolder<FireRisk>(FireRisk.CONTENT_URI);
+
+    private static ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
+    private static final Map<Class<? extends AbstractEntity>, Future> sPendingTasks = new HashMap<Class<? extends AbstractEntity>, Future>();
 
     public static List<ActiveFire> getActiveFires() {
         return sActiveFireHolder.data;
@@ -37,14 +45,37 @@ public class DataProvider {
     }
 
     public static void sync(final Context ctx) {
-        sync(ctx, null);
+        if (ctx == null) {
+            throw new IllegalArgumentException("context must not be null");
+        }
+        Future<SyncStatus> future;
+        future = EXECUTOR.submit(new SyncActiveFiresCallable(ctx, sActiveFireHolder));
+
+
+        future = EXECUTOR.submit(new SyncFireRisksCallable(ctx, sFireRiskHolder));
     }
 
     public static void sync(final Context ctx, Class<? extends AbstractEntity> entityClass) {
         if (ctx == null) {
             throw new IllegalArgumentException("context must not be null");
         }
-        SyncService.sync(ctx, entityClass);
+
+        Future<SyncStatus> future;
+        if (ActiveFire.class.equals(entityClass)) {
+            future = EXECUTOR.submit(new SyncActiveFiresCallable(ctx, sActiveFireHolder));
+        } else if (FireRisk.class.equals(entityClass)) {
+            future = EXECUTOR.submit(new SyncFireRisksCallable(ctx, sFireRiskHolder));
+        } else {
+            throw new IllegalArgumentException("invalid entity class " + entityClass);
+        }
+    }
+
+    public static void cancelSync(final Class<? extends AbstractEntity> entityClass) {
+
+    }
+
+    public static void cancelSync() {
+
     }
 
     private static boolean isSyncAllowed(long syncTime, long currentTime) {

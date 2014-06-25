@@ -10,9 +10,9 @@ import java.util.List;
 /**
  * Created by Ievgen Usenko on 6/23/14.
  */
-class SyncActiveFiresTask extends AbstractSyncTask<ActiveFire> {
+class SyncActiveFiresCallable extends AbstractSyncCallable<ActiveFire> {
 
-    SyncActiveFiresTask(Context mContext, DataHolder<ActiveFire> mDataHolder) {
+    SyncActiveFiresCallable(Context mContext, DataHolder<ActiveFire> mDataHolder) {
         super(mContext, mDataHolder);
     }
 

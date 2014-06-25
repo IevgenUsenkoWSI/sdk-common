@@ -4,18 +4,19 @@ import android.content.Context;
 import android.util.Log;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
  * Created by Ievgen Usenko on 6/23/14.
  */
-abstract class AbstractSyncTask<T> {
-    private static final String TAG = AbstractSyncTask.class.getSimpleName();
+abstract class AbstractSyncCallable<T> implements Callable<SyncStatus> {
+    private static final String TAG = AbstractSyncCallable.class.getSimpleName();
     private static final String DEFAULT_BASE_URL = "http://base-backend-url-stub";
 
     private final Context mContext;
     private final DataHolder<T> mDataHolder;
 
-    protected AbstractSyncTask(Context mContext, DataHolder<T> mDataHolder) {
+    protected AbstractSyncCallable(Context mContext, DataHolder<T> mDataHolder) {
         this.mContext = mContext;
         this.mDataHolder = mDataHolder;
     }
@@ -28,13 +29,15 @@ abstract class AbstractSyncTask<T> {
 
     protected abstract String getId();
 
-    SyncStatus perform() {
+    @Override
+    public SyncStatus call() throws Exception {
         try {
             Log.d(TAG, "sync. start " + getId());
             mDataHolder.status = SyncStatus.SYNCHRONIZING;
             mDataHolder.data = sync();
             mDataHolder.status = SyncStatus.SYNCHRONIZED;
             mDataHolder.syncTime = System.currentTimeMillis();
+            mContext.getContentResolver().notifyChange(mDataHolder.CONTENT_URI, null);
         } catch (Exception e) {
             Log.e(TAG, "sync. error " + getId() + ", url [" + getUrl() + "]", e);
             mDataHolder.status = SyncStatus.ERROR;

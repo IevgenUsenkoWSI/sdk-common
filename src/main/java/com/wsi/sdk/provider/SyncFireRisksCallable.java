@@ -9,8 +9,8 @@ import java.util.List;
 /**
  * Created by Ievgen Usenko on 6/23/14.
  */
-class SyncFireRisksTask extends AbstractSyncTask<FireRisk> {
-    SyncFireRisksTask(Context mContext, DataHolder<FireRisk> mDataHolder) {
+class SyncFireRisksCallable extends AbstractSyncCallable<FireRisk> {
+    SyncFireRisksCallable(Context mContext, DataHolder<FireRisk> mDataHolder) {
         super(mContext, mDataHolder);
     }
 
