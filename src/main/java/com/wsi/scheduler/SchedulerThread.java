@@ -11,7 +11,7 @@ import java.util.WeakHashMap;
  */
 class SchedulerThread extends Thread {
     private static final String TAG = SchedulerThread.class.getSimpleName();
-    private static final long DEFAULT_SCHEDULER_PERIOD = 1000;
+    static final long DEFAULT_SCHEDULER_PERIOD = 1000;
 
     private volatile boolean mRunning = true;
     private long mSchedulerPeriod = DEFAULT_SCHEDULER_PERIOD;

@@ -14,7 +14,7 @@ public class Scheduler {
     SchedulerThread mSchedulerThread;
 
     public synchronized void schedule(final SchedulerListener listener,
-                                      final int delay,
+                                      final long delay,
                                       final boolean repeat) {
         if (listener == null) {
             throw new IllegalArgumentException("listener must not be null");
@@ -28,6 +28,7 @@ public class Scheduler {
 
         if (mSchedulerThread == null || !mSchedulerThread.isRunning()) {
             mSchedulerThread = new SchedulerThread(mListeners);
+            mSchedulerThread.start();
         } else {
             mSchedulerThread.setListeners(mListeners);
         }
@@ -42,5 +43,10 @@ public class Scheduler {
         if (info == null) return;
 
         info.cancelled = true;
+    }
+
+    public synchronized void cancelAll() {
+        if (mSchedulerThread == null || !mSchedulerThread.isRunning()) return;
+        mSchedulerThread.terminate();
     }
 }

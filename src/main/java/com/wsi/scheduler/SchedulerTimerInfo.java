@@ -9,7 +9,7 @@ class SchedulerTimerInfo {
     volatile long currentTime;
     volatile boolean cancelled = false;
 
-    SchedulerTimerInfo(int period, boolean repeat) {
+    SchedulerTimerInfo(long period, boolean repeat) {
         this.period = period;
         this.repeat = repeat;
         this.currentTime = period;
