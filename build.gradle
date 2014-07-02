@@ -5,13 +5,13 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.11.+'
+        classpath 'com.android.tools.build:gradle:0.12.+'
     }
 }
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.1.0"
+    buildToolsVersion "20"
 
     defaultConfig {
         applicationId "com.wsi.sdk"
@@ -29,6 +29,6 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v13:+'
+//    compile 'com.android.support:support-v13:+'
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
