@@ -78,6 +78,23 @@ public class SchedulerTest extends TestCase {
         assertFalse(scheduler.mSchedulerThread.isAlive());
     }
 
+    public void testCancelAll() throws Exception {
+        for (int i = 0; i < 100; i++) {
+            StateAwareSchedulerListener listener = new StateAwareSchedulerListener("toCancel");
+            scheduler.schedule(listener, SchedulerThread.DEFAULT_SCHEDULER_PERIOD, true);
+        }
+        assertTrue(scheduler.mSchedulerThread.isRunning());
+        assertTrue(scheduler.mSchedulerThread.isAlive());
+
+        Thread.sleep(SchedulerThread.DEFAULT_SCHEDULER_PERIOD);
+        scheduler.cancelAll();
+        Thread.sleep(SchedulerThread.DEFAULT_SCHEDULER_PERIOD);
+
+        assertEquals(0, scheduler.mListeners.size());
+        assertFalse(scheduler.mSchedulerThread.isRunning());
+        assertFalse(scheduler.mSchedulerThread.isAlive());
+    }
+
     private static class StateAwareSchedulerListener implements SchedulerListener {
         private final String tag;
         private int onTimerCount = 0;

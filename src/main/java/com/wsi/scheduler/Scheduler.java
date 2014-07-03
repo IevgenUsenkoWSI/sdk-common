@@ -1,6 +1,7 @@
 package com.wsi.scheduler;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -23,7 +24,11 @@ public class Scheduler {
             throw new IllegalArgumentException("invalid delay value " + delay);
         }
 
-        mListeners = new WeakHashMap<SchedulerListener, SchedulerTimerInfo>(mListeners);
+        /**
+         * Don't modify current collection, because at the same time
+         * scheduler thread can iterate over the elements.
+         */
+        mListeners = new HashMap<SchedulerListener, SchedulerTimerInfo>(mListeners);
         mListeners.put(listener, new SchedulerTimerInfo(delay, repeat));
 
         if (mSchedulerThread == null || !mSchedulerThread.isRunning()) {

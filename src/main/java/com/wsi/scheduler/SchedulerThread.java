@@ -40,7 +40,7 @@ class SchedulerThread extends Thread {
                 }
 
                 timer.currentTime -= mSchedulerPeriod;
-                if (timer.currentTime <= 0) {
+                if (timer.currentTime <= 0 && mRunning) {
                     listener.onTimer();
                 }
 
@@ -55,6 +55,7 @@ class SchedulerThread extends Thread {
                 sleep(mSchedulerPeriod);
             } catch (InterruptedException e) {
                 if (mRunning) Log.e(TAG, "scheduler is interrupted", e);
+                mListeners.clear();
                 mRunning = false;
                 return;
             }
